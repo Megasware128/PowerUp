@@ -137,9 +137,18 @@ class Build : NukeBuild
                 var currentBranch = GitRepository.Branch;
 
                 Git("checkout main");
-                Git("pull");
+                if (IsFork)
+                {
+                    Git("pull --set-upstream upstream main");
+                }
+                else
+                {
+                    Git("pull");
+                }
                 Git("checkout " + currentBranch);
                 Git("merge main");
             }
         });
+
+    bool IsFork => Git("remote").Any(x => x.Text == "upstream");
 }
