@@ -76,6 +76,7 @@
               "Install",
               "Pack",
               "Restore",
+              "SetDotNetCorePaths",
               "Update"
             ]
           }
@@ -95,6 +96,7 @@
               "Install",
               "Pack",
               "Restore",
+              "SetDotNetCorePaths",
               "Update"
             ]
           }

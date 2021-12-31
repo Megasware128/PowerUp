@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.Execution;
@@ -76,7 +77,7 @@ class Build : NukeBuild
                 .EnableNoRestore()
                 .SetOutputDirectory(OutputDirectory));
         });
-    
+
     Target Install => _ => _
         .DependsOn(Pack)
         .Executes(() =>
@@ -96,4 +97,28 @@ class Build : NukeBuild
                 .EnableGlobal()
                 .AddSources(OutputDirectory));
         });
+
+    Target SetDotNetCorePaths => _ => _
+        .Executes(() =>
+        {
+            var dotnetPaths = DotNet("--list-runtimes").Select(x => x.Text)
+                                                       .Where(x => x.StartsWith("Microsoft.NETCore.App"))
+                                                       .Select(x => x.Split(' '))
+                                                       .Select(x => (version: x[1], path: (AbsolutePath)(string.Concat(x[2..])[1..^1])))
+                                                       .ToList();
+
+            var dotnetPathDir50 = dotnetPaths.LastOrDefault(x => x.version.StartsWith("5.0."));
+            var dotnetPathDir60 = dotnetPaths.LastOrDefault(x => x.version.StartsWith("6.0."));
+
+            var dotnetPathDirLatest = dotnetPaths.LastOrDefault();
+
+            var appsettings = SerializationTasks.JsonDeserializeFromFile<JObject>(Solution.PowerUp_Watcher.Directory / "appsettings.json");
+
+            if (dotnetPathDir50 != default) appsettings["DotNetCoreDirPathNet5"] = (dotnetPathDir50.path / dotnetPathDir50.version).ToString();
+            if (dotnetPathDir60 != default) appsettings["DotNetCoreDirPathNet6"] = (dotnetPathDir60.path / dotnetPathDir60.version).ToString();
+            if (dotnetPathDirLatest != default) appsettings["DotNetCoreDirPathDefault"] = (dotnetPathDirLatest.path / dotnetPathDirLatest.version).ToString();
+
+            SerializationTasks.JsonSerializeToFile(appsettings, Solution.PowerUp_Watcher.Directory / "appsettings.json");
+        })
+        .DependentFor(Pack);
 }
