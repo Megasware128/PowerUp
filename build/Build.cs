@@ -3,6 +3,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
@@ -19,6 +20,9 @@ using static Nuke.Common.Tools.Git.GitTasks;
 
 [CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
+[GitHubActions("dotnet", GitHubActionsImage.WindowsLatest, GitHubActionsImage.UbuntuLatest,
+    OnPushBranches = new[] { "main" },
+    OnPullRequestBranches = new[] { "main" })]
 class Build : NukeBuild
 {
     /// Support plugins are available for:
@@ -27,7 +31,7 @@ class Build : NukeBuild
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main () => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.Compile);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
