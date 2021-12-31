@@ -15,6 +15,7 @@ using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.Tools.Git.GitTasks;
 
 [CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
@@ -121,4 +122,24 @@ class Build : NukeBuild
             SerializationTasks.JsonSerializeToFile(appsettings, Solution.PowerUp_Watcher.Directory / "appsettings.json");
         })
         .DependentFor(Pack);
+
+    Target Pull => _ => _
+        .DependentFor(Update)
+        .Before(Restore)
+        .Executes(() =>
+        {
+            if (GitRepository.IsOnMainBranch())
+            {
+                Git("pull");
+            }
+            else
+            {
+                var currentBranch = GitRepository.Branch;
+
+                Git("checkout main");
+                Git("pull");
+                Git("checkout " + currentBranch);
+                Git("merge main");
+            }
+        });
 }

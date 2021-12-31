@@ -75,6 +75,7 @@
               "Compile",
               "Install",
               "Pack",
+              "Pull",
               "Restore",
               "SetDotNetCorePaths",
               "Update"
@@ -95,6 +96,7 @@
               "Compile",
               "Install",
               "Pack",
+              "Pull",
               "Restore",
               "SetDotNetCorePaths",
               "Update"
