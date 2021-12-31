@@ -30,7 +30,7 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-    [Solution] readonly Solution Solution;
+    [Solution(GenerateProjects = true)] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
 
@@ -65,4 +65,35 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
+    Target Pack => _ => _
+        .DependsOn(Compile)
+        .Executes(() =>
+        {
+            DotNetPack(s => s
+                .SetProject(Solution.PowerUp_Watcher)
+                .SetConfiguration(Configuration)
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .SetOutputDirectory(OutputDirectory));
+        });
+    
+    Target Install => _ => _
+        .DependsOn(Pack)
+        .Executes(() =>
+        {
+            DotNetToolInstall(s => s
+                .SetPackageName("PowerUp.Watcher")
+                .EnableGlobal()
+                .AddSources(OutputDirectory));
+        });
+
+    Target Update => _ => _
+        .DependsOn(Pack)
+        .Executes(() =>
+        {
+            DotNetToolUpdate(s => s
+                .SetPackageName("PowerUp.Watcher")
+                .EnableGlobal()
+                .AddSources(OutputDirectory));
+        });
 }
