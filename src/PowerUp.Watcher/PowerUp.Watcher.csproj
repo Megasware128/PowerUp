@@ -5,6 +5,8 @@
     <OutputType>Exe</OutputType>
     <TieredCompilation>true</TieredCompilation>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>powerup</ToolCommandName>
   </PropertyGroup>
 
   <ItemGroup>
