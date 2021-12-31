@@ -125,7 +125,7 @@ class Build : NukeBuild
 
     Target Pull => _ => _
         .DependentFor(Update)
-        .Before(Restore)
+        .Before(Restore, SetDotNetCorePaths)
         .Executes(() =>
         {
             if (GitRepository.IsOnMainBranch())
@@ -134,6 +134,8 @@ class Build : NukeBuild
             }
             else
             {
+                Git("checkout " + Solution.PowerUp_Watcher.Directory / "appsettings.json");
+
                 var currentBranch = GitRepository.Branch;
 
                 Git("checkout main");
