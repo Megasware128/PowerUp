@@ -78,6 +78,7 @@ class Build : NukeBuild
             DotNetPack(s => s
                 .SetProject(Solution.PowerUp_Watcher)
                 .SetConfiguration(Configuration)
+                .SetVersion(GitVersion.NuGetVersion)
                 .EnableNoBuild()
                 .EnableNoRestore()
                 .SetOutputDirectory(OutputDirectory));
@@ -89,6 +90,7 @@ class Build : NukeBuild
         {
             DotNetToolInstall(s => s
                 .SetPackageName("PowerUp.Watcher")
+                .SetVersion(GitVersion.NuGetVersion)
                 .EnableGlobal()
                 .AddSources(OutputDirectory));
         });
@@ -99,6 +101,7 @@ class Build : NukeBuild
         {
             DotNetToolUpdate(s => s
                 .SetPackageName("PowerUp.Watcher")
+                .SetVersion(GitVersion.NuGetVersion)
                 .EnableGlobal()
                 .AddSources(OutputDirectory));
         });
