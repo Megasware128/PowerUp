@@ -155,7 +155,14 @@ class Build : NukeBuild
                     Git("pull");
                 }
                 Git("checkout " + currentBranch);
-                Git("merge main");
+                if (string.IsNullOrEmpty(GitRepository.RemoteBranch))
+                {
+                    Git("rebase main");
+                }
+                else
+                {
+                    Git("merge main");
+                }
             }
         });
 
